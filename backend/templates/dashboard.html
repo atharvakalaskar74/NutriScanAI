@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>NutriScan AI Dashboard</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f1f7f2;
+    color: #222;
+}
+
+.navbar {
+    background: white;
+    padding: 16px 6%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,.08);
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #238636;
+    text-decoration: none;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.nav-btn {
+    text-decoration: none;
+    color: #238636;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.nav-btn:hover {
+    background: #eef8ef;
+}
+
+.nav-btn.active {
+    background: #238636;
+    color: white;
+}
+
+.logout {
+    text-decoration: none;
+    background: #d32f2f;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.container {
+    width: 90%;
+    max-width: 1100px;
+    margin: 35px auto 60px;
+}
+
+.welcome {
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.subtitle {
+    color: #777;
+    margin-top: 6px;
+}
+
+.section-title {
+    margin-top: 35px;
+    font-size: 22px;
+    color: #238636;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 18px;
+    margin-top: 18px;
+}
+
+.card-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.card {
+    background: white;
+    padding: 24px 20px;
+    border-radius: 18px;
+    box-shadow: 0 5px 20px rgba(0,0,0,.07);
+    transition: .2s;
+    height: 100%;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,.12);
+}
+
+.icon {
+    font-size: 34px;
+}
+
+.card h3 {
+    color: #238636;
+    margin: 12px 0 6px;
+    font-size: 18px;
+}
+
+.card p {
+    color: #666;
+    font-size: 13px;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.summary {
+    background: white;
+    margin-top: 30px;
+    padding: 26px;
+    border-radius: 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,.07);
+}
+
+.summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.summary-header h2 {
+    margin: 0;
+    color: #238636;
+    font-size: 22px;
+}
+
+.stat-pills {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.stat-pill {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.pill-meals {
+    background: #e8f0fe;
+    color: #1967d2;
+}
+
+.pill-score {
+    background: #e8f5e9;
+    color: #238636;
+}
+
+.nutrition-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+}
+
+.nutrition-card {
+    padding: 18px;
+    background: #f4f9f4;
+    border-radius: 15px;
+    border: 1px solid #e0ede0;
+}
+
+.value {
+    font-size: 22px;
+    font-weight: bold;
+    color: #238636;
+}
+
+.label {
+    color: #666;
+    margin-top: 5px;
+    font-size: 13px;
+}
+
+.bar {
+    height: 8px;
+    background: #ddd;
+    border-radius: 20px;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+.fill {
+    height: 100%;
+    background: #238636;
+    border-radius: 20px;
+}
+
+/* RECENT MEALS */
+.recent-meals {
+    margin-top: 35px;
+}
+
+.meals-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.meal-item {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    display: flex;
+    gap: 14px;
+    align-items: center;
+}
+
+.meal-img {
+    width: 65px;
+    height: 65px;
+    border-radius: 12px;
+    object-fit: cover;
+    background: #e8f5e9;
+    flex-shrink: 0;
+}
+
+.meal-info {
+    flex-grow: 1;
+}
+
+.meal-name {
+    font-weight: bold;
+    font-size: 15px;
+    color: #222;
+}
+
+.meal-meta {
+    font-size: 12px;
+    color: #888;
+    margin-top: 2px;
+}
+
+.meal-macros {
+    font-size: 13px;
+    color: #238636;
+    font-weight: bold;
+    margin-top: 4px;
+}
+
+.meal-score {
+    padding: 4px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+}
+
+.empty-state {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    text-align: center;
+    color: #777;
+}
+
+@media(max-width:750px) {
+    .navbar {
+        flex-direction: column;
+        gap: 12px;
+    }
+    .welcome {
+        font-size: 24px;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+    <a class="logo" href="{{ url_for('dashboard') }}">
+        🥗 NutriScan AI
+    </a>
+
+    <div class="nav-links">
+        <a class="nav-btn active" href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a class="nav-btn" href="{{ url_for('scan_food') }}">📸 Scan Food</a>
+        <a class="nav-btn" href="{{ url_for('meal_history') }}">📅 History</a>
+        <a class="nav-btn" href="{{ url_for('analytics') }}">📈 Analytics</a>
+        <a class="nav-btn" href="{{ url_for('chatbot_page') }}">🤖 AI Chatbot</a>
+        <a class="nav-btn" href="{{ url_for('profile') }}">👤 Profile</a>
+        <a class="logout" href="{{ url_for('logout') }}">Logout</a>
+    </div>
+</div>
+
+
+<div class="container">
+
+    <div class="welcome">
+        Hello, {{ user_name }} 👋
+    </div>
+
+    <div class="subtitle">
+        Welcome to your personal AI nutrition dashboard.
+    </div>
+
+
+    <h2 class="section-title">
+        Quick Actions
+    </h2>
+
+
+    <div class="grid">
+
+        <a class="card-link" href="{{ url_for('scan_food') }}">
+            <div class="card">
+                <div class="icon">📸</div>
+                <h3>Scan Food</h3>
+                <p>Upload a food image and let AI identify it with nutritional breakdown.</p>
+            </div>
+        </a>
+
+        <a class="card-link" href="{{ url_for('meal_history') }}">
+            <div class="card">
+                <div class="icon">📅</div>
+                <h3>Meal History</h3>
+                <p>Review previously analyzed meals, photos, and AI insights.</p>
+            </div>
+        </a>
+
+        <a class="card-link" href="{{ url_for('analytics') }}">
+            <div class="card">
+                <div class="icon">📈</div>
+                <h3>Analytics</h3>
+                <p>Track weekly calorie trends, macronutrient balances, and habits.</p>
+            </div>
+        </a>
+
+        <a class="card-link" href="{{ url_for('chatbot_page') }}">
+            <div class="card">
+                <div class="icon">🤖</div>
+                <h3>AI Chatbot</h3>
+                <p>Ask nutrition questions answered using your actual logged data.</p>
+            </div>
+        </a>
+
+    </div>
+
+
+    <div class="summary" id="today">
+
+        <div class="summary-header">
+            <div>
+                <h2>📊 Today's Nutrition Intake</h2>
+                <div style="font-size:13px; color:#777; margin-top:3px;">Track your daily progress toward target goals.</div>
+            </div>
+
+            <div class="stat-pills">
+                <div class="stat-pill pill-meals">
+                    🍽️ {{ today.meal_count or 0 }} Meal(s) Today
+                </div>
+                {% if today_health_score %}
+                <div class="stat-pill pill-score">
+                    ⭐ Health Score: {{ today_health_score }}/100
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+
+        <div class="nutrition-grid">
+
+            <div class="nutrition-card">
+                <div class="value">🔥 {{ today.calories }} kcal</div>
+                <div class="label">Calories / {{ calorie_goal }} kcal</div>
+                <div class="bar">
+                    <div class="fill" data-value="{{ today.calories }}" data-goal="{{ calorie_goal }}"></div>
+                </div>
+            </div>
+
+            <div class="nutrition-card">
+                <div class="value">💪 {{ today.protein }} g</div>
+                <div class="label">Protein / {{ protein_goal }} g</div>
+                <div class="bar">
+                    <div class="fill" data-value="{{ today.protein }}" data-goal="{{ protein_goal }}"></div>
+                </div>
+            </div>
+
+            <div class="nutrition-card">
+                <div class="value">🍚 {{ today.carbohydrates }} g</div>
+                <div class="label">Carbohydrates / {{ carb_goal }} g</div>
+                <div class="bar">
+                    <div class="fill" data-value="{{ today.carbohydrates }}" data-goal="{{ carb_goal }}"></div>
+                </div>
+            </div>
+
+            <div class="nutrition-card">
+                <div class="value">🥑 {{ today.fat }} g</div>
+                <div class="label">Fat / {{ fat_goal }} g</div>
+                <div class="bar">
+                    <div class="fill" data-value="{{ today.fat }}" data-goal="{{ fat_goal }}"></div>
+                </div>
+            </div>
+
+            <div class="nutrition-card">
+                <div class="value">🌾 {{ today.fiber }} g</div>
+                <div class="label">Fiber / {{ fiber_goal }} g</div>
+                <div class="bar">
+                    <div class="fill" data-value="{{ today.fiber }}" data-goal="{{ fiber_goal }}"></div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- RECENT MEALS FEED -->
+    <div class="recent-meals">
+        <div class="section-title">
+            <span>🕒 Recent Scanned Meals</span>
+            <a href="{{ url_for('meal_history') }}" style="font-size:14px; text-decoration:none; color:#238636; font-weight:bold;">
+                View All →
+            </a>
+        </div>
+
+        {% if recent_meals %}
+        <div class="meals-list">
+            {% for m in recent_meals %}
+            <div class="meal-item">
+                {% if m.image_url %}
+                <img src="{{ m.image_url }}" class="meal-img" alt="{{ m.food_name }}" onerror="this.src='https://placehold.co/100x100?text=Food'">
+                {% else %}
+                <div class="meal-img" style="display:flex; align-items:center; justify-content:center; font-size:24px;">🍽️</div>
+                {% endif %}
+
+                <div class="meal-info">
+                    <div class="meal-name">{{ m.food_name }}</div>
+                    <div class="meal-meta">{{ m.meal_type or "Meal" }} • {{ m.created_at }}</div>
+                    <div class="meal-macros">{{ m.calories }} kcal • {{ m.protein }}g Protein</div>
+                </div>
+
+                {% if m.health_score %}
+                <div class="meal-score" style="background:{{ m.health_score.color }};">
+                    {{ m.health_score.score }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h3>No meals logged yet</h3>
+            <p>Scan a photo of your food to start tracking your daily nutrition.</p>
+            <a href="{{ url_for('scan_food') }}" style="color:#238636; font-weight:bold; text-decoration:none;">📸 Scan Your First Meal</a>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<script>
+document.querySelectorAll(".fill").forEach(function(bar) {
+    const value = Number(bar.dataset.value) || 0;
+    const goal = Number(bar.dataset.goal) || 1;
+    const percent = Math.min((value / goal) * 100, 100);
+    bar.style.width = percent + "%";
+});
+</script>
+
+</body>
+</html>

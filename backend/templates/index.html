@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scan Food - NutriScan AI</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f1f7f2;
+    color: #222;
+}
+
+/* NAVBAR */
+.navbar {
+    background: white;
+    padding: 16px 6%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,.08);
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #238636;
+    text-decoration: none;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.nav-btn {
+    text-decoration: none;
+    color: #238636;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.nav-btn:hover {
+    background: #eef8ef;
+}
+
+.nav-btn.active {
+    background: #238636;
+    color: white;
+}
+
+.logout {
+    text-decoration: none;
+    background: #d32f2f;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.container {
+    width: 90%;
+    max-width: 720px;
+    margin: 30px auto 60px;
+}
+
+.card {
+    background: white;
+    padding: 30px;
+    border-radius: 22px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    text-align: center;
+}
+
+.title {
+    font-size: 32px;
+    font-weight: bold;
+    color: #238636;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    color: #666;
+    margin-bottom: 22px;
+    font-size: 15px;
+}
+
+/* SCAN MODE TABS */
+.mode-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 22px;
+}
+
+.tab-btn {
+    background: #f0f7f1;
+    color: #444;
+    border: 2px solid #d0e8d3;
+    padding: 11px 22px;
+    border-radius: 30px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tab-btn:hover {
+    background: #e1f2e4;
+}
+
+.tab-btn.active {
+    background: #238636;
+    color: white;
+    border-color: #238636;
+    box-shadow: 0 4px 12px rgba(35, 134, 54, 0.25);
+}
+
+/* SCAN SECTIONS */
+.scan-section {
+    display: none;
+    animation: fadeIn 0.25s ease-in-out;
+}
+
+.scan-section.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.scanner-box {
+    border: 2px dashed #55a85a;
+    border-radius: 18px;
+    padding: 24px 20px;
+    margin-bottom: 20px;
+    background: #f8fcf8;
+}
+
+/* CAMERA VIEWFINDER */
+.camera-container {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    height: 360px;
+    margin: 0 auto 18px;
+    background: #111;
+    border-radius: 16px;
+    overflow: hidden;
+    display: none;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+}
+
+#cameraVideo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Viewfinder Overlay Guide */
+.viewfinder-guide {
+    position: absolute;
+    top: 15%;
+    left: 15%;
+    width: 70%;
+    height: 70%;
+    border: 2px dashed rgba(255, 255, 255, 0.7);
+    border-radius: 14px;
+    pointer-events: none;
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.35);
+}
+
+.viewfinder-label {
+    position: absolute;
+    bottom: 12px;
+    width: 100%;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 13px;
+    font-weight: bold;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+    pointer-events: none;
+}
+
+/* CAMERA CONTROLS */
+.camera-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+.btn-camera {
+    background: #238636;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-camera:hover {
+    background: #176b29;
+}
+
+.btn-secondary-camera {
+    background: #eef8ef;
+    color: #238636;
+    border: 1px solid #238636;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-secondary-camera:hover {
+    background: #def2e0;
+}
+
+.btn-danger-camera {
+    background: #ffebee;
+    color: #c62828;
+    border: 1px solid #c62828;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.form-row {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+select {
+    padding: 10px 14px;
+    border: 1px solid #c3e0c7;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    color: #333;
+}
+
+input[type="file"] {
+    max-width: 100%;
+}
+
+button:disabled {
+    background: #999 !important;
+    cursor: not-allowed !important;
+    border-color: #999 !important;
+    color: white !important;
+}
+
+#preview {
+    width: 100%;
+    max-width: 380px;
+    max-height: 280px;
+    object-fit: cover;
+    border-radius: 15px;
+    margin: 20px auto;
+    display: none;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.result {
+    margin-top: 20px;
+}
+
+.food-name {
+    font-size: 26px;
+    font-weight: bold;
+    color: #238636;
+    margin: 10px 0 5px;
+}
+
+.badge-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+.confidence {
+    background: #eef8ef;
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #238636;
+    border: 1px solid #cce8cf;
+}
+
+.demo-banner {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-weight: bold;
+    margin: 10px 0;
+    font-size: 13px;
+}
+
+/* HEALTH SCORE CARD */
+.score-card {
+    background: linear-gradient(135deg, #f7fcf8, #eef9ef);
+    border: 2px solid #55a85a;
+    border-radius: 18px;
+    padding: 20px;
+    margin: 20px 0;
+    text-align: left;
+}
+
+.score-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.score-number {
+    font-size: 38px;
+    font-weight: bold;
+    color: #238636;
+}
+
+.score-badge {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 14px;
+    color: white;
+}
+
+.score-explanation {
+    color: #444;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* NUTRITION GRID */
+.nutrition-title {
+    text-align: left;
+    font-size: 20px;
+    font-weight: bold;
+    margin: 25px 0 12px;
+    color: #238636;
+}
+
+.nutrition-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.nutrition-item {
+    padding: 16px 8px;
+    border-radius: 14px;
+    background: #f4f9f4;
+    border: 1px solid #dcecdc;
+    text-align: center;
+}
+
+.nutrition-value {
+    font-size: 21px;
+    font-weight: bold;
+    color: #238636;
+}
+
+.nutrition-label {
+    font-size: 13px;
+    color: #666;
+    margin-top: 4px;
+}
+
+.extra-info {
+    margin-top: 15px;
+    padding: 15px;
+    background: #fafafa;
+    border-radius: 12px;
+    text-align: left;
+    font-size: 14px;
+    line-height: 1.7;
+    border: 1px solid #eee;
+}
+
+.insight-card {
+    margin-top: 20px;
+    padding: 20px;
+    background: #eef8ef;
+    border-radius: 15px;
+    text-align: left;
+    border: 1px solid #d8edd9;
+}
+
+.insight-card h3 {
+    margin: 0 0 8px;
+    color: #238636;
+    font-size: 17px;
+}
+
+.insight-card p {
+    margin: 0 0 15px;
+    font-size: 14px;
+    color: #333;
+    line-height: 1.5;
+}
+
+.action-buttons {
+    margin-top: 25px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    text-decoration: none;
+    padding: 12px 22px;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 14px;
+    display: inline-block;
+}
+
+.btn-primary {
+    background: #238636;
+    color: white;
+}
+
+.btn-secondary {
+    background: #eef8ef;
+    color: #238636;
+    border: 1px solid #238636;
+}
+
+.alert-box {
+    padding: 14px 18px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: bold;
+    margin: 15px 0;
+    text-align: left;
+    display: none;
+}
+
+.alert-error {
+    background: #ffebee;
+    color: #c62828;
+    border: 1px solid #ffcdd2;
+}
+
+.alert-warning {
+    background: #fff8e1;
+    color: #b78103;
+    border: 1px solid #ffe082;
+}
+
+.loading {
+    color: #238636;
+    font-weight: bold;
+    padding: 18px;
+    font-size: 16px;
+}
+
+.footer {
+    margin-top: 25px;
+    font-size: 13px;
+    color: #888;
+}
+
+@media (max-width: 600px) {
+    .nutrition-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .camera-container {
+        height: 280px;
+    }
+    .navbar {
+        flex-direction: column;
+        gap: 12px;
+    }
+    .tab-btn {
+        padding: 9px 16px;
+        font-size: 14px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+    <a href="{{ url_for('dashboard') }}" class="logo">
+        🥗 NutriScan AI
+    </a>
+    <div class="nav-links">
+        <a class="nav-btn" href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a class="nav-btn active" href="{{ url_for('scan_food') }}">📸 Scan Food</a>
+        <a class="nav-btn" href="{{ url_for('meal_history') }}">📅 History</a>
+        <a class="nav-btn" href="{{ url_for('analytics') }}">📈 Analytics</a>
+        <a class="nav-btn" href="{{ url_for('chatbot_page') }}">🤖 AI Chatbot</a>
+        <a class="nav-btn" href="{{ url_for('profile') }}">👤 Profile</a>
+        <a class="logout" href="{{ url_for('logout') }}">Logout</a>
+    </div>
+</div>
+
+<div class="container">
+
+<div class="card">
+
+    <div class="title">
+        🥗 AI Food Scanner
+    </div>
+
+    <div class="subtitle">
+        Identify food, calculate nutritional macros, and view explainable health scores with AI.
+    </div>
+
+    <!-- SCAN MODE TABS -->
+    <div class="mode-tabs">
+        <button class="tab-btn active" id="tabCamera" onclick="switchMode('camera')">
+            📷 Live Camera
+        </button>
+        <button class="tab-btn" id="tabUpload" onclick="switchMode('upload')">
+            🖼️ Upload Image
+        </button>
+    </div>
+
+    <!-- SHARED MEAL TYPE SELECTOR -->
+    <div style="margin-bottom: 18px; display:flex; justify-content:center; align-items:center; gap:10px;">
+        <label for="mealType" style="font-weight:bold; font-size:14px; color:#444;">Meal Type:</label>
+        <select id="mealType">
+            <option value="Breakfast">Breakfast</option>
+            <option value="Lunch" selected>Lunch</option>
+            <option value="Dinner">Dinner</option>
+            <option value="Snack">Snack</option>
+            <option value="Meal">Meal</option>
+        </select>
+    </div>
+
+    <!-- OPTION 1: LIVE CAMERA SECTION -->
+    <div class="scan-section active" id="cameraSection">
+        <div class="scanner-box">
+
+            <!-- Camera Viewfinder -->
+            <div class="camera-container" id="cameraContainer">
+                <video id="cameraVideo" autoplay playsinline muted></video>
+                <div class="viewfinder-guide"></div>
+                <div class="viewfinder-label">🍽️ Center your food in the frame</div>
+            </div>
+
+            <!-- Hidden canvas for snapshot capture -->
+            <canvas id="captureCanvas" style="display: none;"></canvas>
+
+            <!-- Pre-camera State (Explicit Open Button) -->
+            <div id="cameraPromptState">
+                <p style="color:#555; font-size:14px; margin-bottom:16px;">
+                    Click below to open your camera and scan food directly from your plate.
+                </p>
+                <button class="btn-camera" id="openCameraBtn" onclick="startCamera()">
+                    📷 Open Camera
+                </button>
+                <div style="font-size:12px; color:#888; margin-top:10px;">
+                    🔒 NutriScan AI only accesses your camera when you click Open Camera.
+                </div>
+            </div>
+
+            <!-- Active Camera State Controls -->
+            <div id="cameraActiveControls" class="camera-controls" style="display: none;">
+                <button class="btn-camera" id="captureBtn" onclick="captureAndScan()">
+                    📸 Capture & Scan
+                </button>
+                <button class="btn-secondary-camera" id="flipBtn" onclick="flipCamera()" title="Switch Front/Back Camera">
+                    🔄 Flip Camera
+                </button>
+                <button class="btn-danger-camera" id="stopCameraBtn" onclick="stopCamera()">
+                    ⏹️ Stop Camera
+                </button>
+            </div>
+
+            <!-- Camera Error Alert Box -->
+            <div class="alert-box alert-error" id="cameraErrorBox"></div>
+
+            <!-- Insecure context alert if applicable -->
+            <div class="alert-box alert-warning" id="insecureContextBox">
+                ⚠️ <b>Camera Security Notice:</b> Browser camera access requires HTTPS or localhost. If you are accessing over a local network IP, please use the <b>Upload Image</b> tab instead.
+            </div>
+
+        </div>
+    </div>
+
+    <!-- OPTION 2: UPLOAD IMAGE SECTION -->
+    <div class="scan-section" id="uploadSection">
+        <div class="scanner-box">
+            <p style="color:#555; font-size:14px; margin-bottom:14px;">
+                Select a food photo (.jpg, .jpeg, .png, .webp) from your device gallery or files.
+            </p>
+
+            <input
+                type="file"
+                id="imageInput"
+                accept="image/*"
+            >
+
+            <div style="margin-top: 18px;">
+                <button id="uploadScanBtn" class="btn-camera" onclick="uploadAndScan()">
+                    🔍 Scan Food
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- IMAGE PREVIEW (SHARED) -->
+    <img id="preview" alt="Scanned Food Preview">
+
+    <!-- RETAKE BUTTON (Appears after capture/preview) -->
+    <div id="retakeContainer" style="display:none; margin: 10px 0;">
+        <button class="btn-secondary-camera" onclick="retakePhoto()">
+            🔁 Retake / Scan Another
+        </button>
+    </div>
+
+    <!-- SCANNER RESULT CONTAINER -->
+    <div id="result" class="result"></div>
+
+    <div class="footer">
+        🤖 Powered by NutriScan AI Vision & Nutritional Intelligence
+    </div>
+
+</div>
+
+</div>
+
+<script>
+// Elements
+const tabCamera = document.getElementById("tabCamera");
+const tabUpload = document.getElementById("tabUpload");
+const cameraSection = document.getElementById("cameraSection");
+const uploadSection = document.getElementById("uploadSection");
+
+const cameraContainer = document.getElementById("cameraContainer");
+const cameraVideo = document.getElementById("cameraVideo");
+const captureCanvas = document.getElementById("captureCanvas");
+const cameraPromptState = document.getElementById("cameraPromptState");
+const cameraActiveControls = document.getElementById("cameraActiveControls");
+const cameraErrorBox = document.getElementById("cameraErrorBox");
+const insecureContextBox = document.getElementById("insecureContextBox");
+
+const imageInput = document.getElementById("imageInput");
+const uploadScanBtn = document.getElementById("uploadScanBtn");
+const preview = document.getElementById("preview");
+const retakeContainer = document.getElementById("retakeContainer");
+const result = document.getElementById("result");
+const mealTypeSelect = document.getElementById("mealType");
+
+// Camera state variables
+let cameraStream = null;
+let currentFacingMode = "environment"; // Prefer rear camera on smartphones
+let isScanning = false;
+
+// ---------------------------------------------------------
+// TAB SWITCHING (CAMERA vs UPLOAD)
+// ---------------------------------------------------------
+function switchMode(mode) {
+    if (mode === 'camera') {
+        tabCamera.classList.add("active");
+        tabUpload.classList.remove("active");
+        cameraSection.classList.add("active");
+        uploadSection.classList.remove("active");
+    } else {
+        stopCamera();
+        tabUpload.classList.add("active");
+        tabCamera.classList.remove("active");
+        uploadSection.classList.add("active");
+        cameraSection.classList.remove("active");
+    }
+}
+
+// Check for secure context
+if (window.isSecureContext === false && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+    insecureContextBox.style.display = "block";
+}
+
+// ---------------------------------------------------------
+// LIVE CAMERA IMPLEMENTATION (getUserMedia)
+// ---------------------------------------------------------
+
+async function startCamera() {
+    hideCameraError();
+    result.innerHTML = "";
+
+    // Check browser compatibility
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showCameraError("Your browser or device does not support native camera access. Please use the 'Upload Image' tab.");
+        return;
+    }
+
+    try {
+        // Request camera with ideal facing mode
+        const constraints = {
+            video: {
+                facingMode: { ideal: currentFacingMode },
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            },
+            audio: false
+        };
+
+        cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+        cameraVideo.srcObject = cameraStream;
+        await cameraVideo.play();
+
+        // Update UI to active camera view
+        cameraContainer.style.display = "block";
+        cameraPromptState.style.display = "none";
+        cameraActiveControls.style.display = "flex";
+        preview.style.display = "none";
+        retakeContainer.style.display = "none";
+
+    } catch (err) {
+        console.error("Camera access error:", err);
+        stopCamera();
+
+        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+            showCameraError("Camera permission was denied. Please allow camera access in your browser site permissions and try again, or use the 'Upload Image' tab.");
+        } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+            showCameraError("No camera found on this device. Please connect a webcam or switch to the 'Upload Image' tab.");
+        } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
+            showCameraError("Camera is currently busy or in use by another application. Please close other camera apps and retry.");
+        } else {
+            showCameraError("Could not start camera (" + (err.message || err.name) + "). Please try again or use 'Upload Image'.");
+        }
+    }
+}
+
+function stopCamera() {
+    if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+    }
+    if (cameraVideo) {
+        cameraVideo.srcObject = null;
+    }
+    cameraContainer.style.display = "none";
+    cameraPromptState.style.display = "block";
+    cameraActiveControls.style.display = "none";
+}
+
+// Stop camera on tab leave or beforeunload to preserve privacy & battery
+window.addEventListener("beforeunload", stopCamera);
+document.addEventListener("visibilitychange", function() {
+    if (document.hidden) {
+        stopCamera();
+    }
+});
+
+async function flipCamera() {
+    currentFacingMode = (currentFacingMode === "environment") ? "user" : "environment";
+    stopCamera();
+    await startCamera();
+}
+
+function showCameraError(msg) {
+    cameraErrorBox.innerHTML = "❌ " + msg;
+    cameraErrorBox.style.display = "block";
+}
+
+function hideCameraError() {
+    cameraErrorBox.style.display = "none";
+}
+
+function retakePhoto() {
+    retakeContainer.style.display = "none";
+    preview.style.display = "none";
+    result.innerHTML = "";
+    startCamera();
+}
+
+// ---------------------------------------------------------
+// CAPTURE & SCAN FROM LIVE CAMERA
+// ---------------------------------------------------------
+
+async function captureAndScan() {
+    if (isScanning || !cameraStream || !cameraVideo.videoWidth) {
+        return;
+    }
+
+    isScanning = true;
+    const captureBtn = document.getElementById("captureBtn");
+    captureBtn.disabled = true;
+    captureBtn.innerHTML = "⏳ Capturing...";
+
+    try {
+        // Match canvas dimensions to actual video stream resolution
+        captureCanvas.width = cameraVideo.videoWidth;
+        captureCanvas.height = cameraVideo.videoHeight;
+        const ctx = captureCanvas.getContext("2d");
+        ctx.drawImage(cameraVideo, 0, 0, captureCanvas.width, captureCanvas.height);
+
+        // Convert canvas frame to JPEG Blob
+        captureCanvas.toBlob(async function(blob) {
+            if (!blob || blob.size < 500) {
+                showCameraError("Captured frame was empty. Please aim your camera steadily at your food and try again.");
+                captureBtn.disabled = false;
+                captureBtn.innerHTML = "📸 Capture & Scan";
+                isScanning = false;
+                return;
+            }
+
+            // Display captured frame as preview
+            preview.src = URL.createObjectURL(blob);
+            preview.style.display = "block";
+            retakeContainer.style.display = "block";
+
+            // Stop camera stream now that we have captured the frame
+            stopCamera();
+
+            // Send captured blob to existing /predict endpoint
+            await submitScanRequest(blob, "camera_capture.jpg");
+
+            captureBtn.disabled = false;
+            captureBtn.innerHTML = "📸 Capture & Scan";
+            isScanning = false;
+
+        }, "image/jpeg", 0.92);
+
+    } catch (err) {
+        console.error("Frame capture error:", err);
+        showCameraError("Failed to capture photo: " + err.message);
+        captureBtn.disabled = false;
+        captureBtn.innerHTML = "📸 Capture & Scan";
+        isScanning = false;
+    }
+}
+
+// ---------------------------------------------------------
+// UPLOAD & SCAN (OPTION 2)
+// ---------------------------------------------------------
+
+imageInput.addEventListener("change", function() {
+    const file = this.files[0];
+    if (file) {
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = "block";
+        result.innerHTML = "";
+    }
+});
+
+async function uploadAndScan() {
+    const file = imageInput.files[0];
+    if (!file) {
+        result.innerHTML = '<div class="alert-box alert-error" style="display:block;">❌ Please select a food image first.</div>';
+        return;
+    }
+
+    uploadScanBtn.disabled = true;
+    uploadScanBtn.innerHTML = "⏳ Scanning...";
+    await submitScanRequest(file, file.name);
+    uploadScanBtn.disabled = false;
+    uploadScanBtn.innerHTML = "🔍 Scan Food";
+}
+
+// ---------------------------------------------------------
+// COMMON AI SCAN REQUEST (Uses Existing /predict Pipeline)
+// ---------------------------------------------------------
+
+async function submitScanRequest(fileOrBlob, filename) {
+    result.innerHTML = '<div class="loading">🤖 AI is recognizing your food and calculating nutrition...</div>';
+
+    const formData = new FormData();
+    formData.append("food_image", fileOrBlob, filename || "food_image.jpg");
+    formData.append("meal_type", mealTypeSelect.value);
+
+    try {
+        const response = await fetch("/predict", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Server processing error");
+        }
+
+        if (data.success) {
+            showResult(data);
+        } else {
+            result.innerHTML = '<div class="alert-box alert-error" style="display:block;">❌ ' + (data.error || "Scanning failed.") + '</div>';
+        }
+
+    } catch (error) {
+        result.innerHTML = '<div class="alert-box alert-error" style="display:block;">❌ Server connection error: ' + error.message + '</div>';
+        console.error(error);
+    }
+}
+
+// ---------------------------------------------------------
+// DISPLAY COMPREHENSIVE RESULT
+// ---------------------------------------------------------
+
+function showResult(data) {
+    const food = data.food || "Recognized Food";
+    const confidence = Number(data.confidence || 0).toFixed(1);
+    const n = data.nutrition || {};
+    const score = data.health_score || { score: 75, category: "Balanced", color: "#238636", explanation: "Standard nutritional balance." };
+
+    let html = `
+        <div>
+            <div style="font-size:14px; font-weight:bold; color:#238636;">✅ Food Recognized</div>
+            <div class="food-name">🍽️ ${food}</div>
+
+            <div class="badge-row">
+                <div class="confidence">🤖 AI Confidence: <b>${confidence}%</b></div>
+                <div class="confidence" style="background:#e8f0fe; color:#1967d2; border-color:#c7dcff;">
+                    🍽️ ${mealTypeSelect.value}
+                </div>
+            </div>
+
+            ${data.is_demo ? `<div class="demo-banner">⚠️ ${data.demo_notice}</div>` : ''}
+        </div>
+
+        <!-- 0-100 HEALTH SCORE -->
+        <div class="score-card">
+            <div class="score-header">
+                <div>
+                    <span style="font-size:13px; font-weight:bold; color:#666; text-transform:uppercase; letter-spacing:0.5px;">Health Score</span>
+                    <div class="score-number">${score.score}<span style="font-size:20px; color:#888;">/100</span></div>
+                </div>
+                <div class="score-badge" style="background:${score.color};">
+                    ${score.category}
+                </div>
+            </div>
+            <div class="score-explanation">
+                💡 <b>Nutrition Analysis:</b> ${score.explanation}
+            </div>
+        </div>
+
+        <!-- NUTRITION DETAILS -->
+        <div class="nutrition-title">
+            📊 Nutritional Breakdown
+        </div>
+
+        <div class="nutrition-grid">
+            <div class="nutrition-item">
+                <div class="nutrition-value">🔥 ${n.calories || 0}</div>
+                <div class="nutrition-label">Calories (kcal)</div>
+            </div>
+            <div class="nutrition-item">
+                <div class="nutrition-value">💪 ${n.protein || 0}g</div>
+                <div class="nutrition-label">Protein</div>
+            </div>
+            <div class="nutrition-item">
+                <div class="nutrition-value">🍚 ${n.carbohydrates || 0}g</div>
+                <div class="nutrition-label">Carbs</div>
+            </div>
+            <div class="nutrition-item">
+                <div class="nutrition-value">🥑 ${n.fat || 0}g</div>
+                <div class="nutrition-label">Fat</div>
+            </div>
+            <div class="nutrition-item">
+                <div class="nutrition-value">🌾 ${n.fiber || 0}g</div>
+                <div class="nutrition-label">Fiber</div>
+            </div>
+            <div class="nutrition-item">
+                <div class="nutrition-value">🍬 ${n.sugar || 0}g</div>
+                <div class="nutrition-label">Sugar</div>
+            </div>
+        </div>
+
+        <div class="extra-info">
+            🧂 <b>Sodium:</b> ${n.sodium || 0} mg &nbsp;|&nbsp; 🍽️ <b>Serving:</b> ${n.serving_size || "1 serving"}
+            ${n.ingredients ? `<br>🥗 <b>Possible Ingredients:</b> ${n.ingredients}` : ''}
+        </div>
+
+        <!-- AI INSIGHTS & RECOMMENDATIONS -->
+        <div class="insight-card">
+            <h3>🤖 AI Nutrition Explanation</h3>
+            <p>${data.ai_message || "Balanced meal profile suitable for daily energy needs."}</p>
+
+            <h3>💡 AI Recommendation</h3>
+            <p>${data.recommendation || "Maintain dietary variety and drink adequate water throughout the day."}</p>
+        </div>
+
+        <!-- ACTION CONFIRMATION & NAVIGATION -->
+        <div style="margin-top:20px; padding:12px; background:#e8f5e9; border-radius:10px; color:#238636; font-weight:bold; font-size:14px;">
+            ✅ Meal automatically saved to your history!
+        </div>
+
+        <div class="action-buttons">
+            <a href="/meal-history" class="action-btn btn-primary">📅 View in Meal History</a>
+            <a href="/dashboard" class="action-btn btn-secondary">📊 Go to Dashboard</a>
+        </div>
+    `;
+
+    result.innerHTML = html;
+}
+</script>
+
+</body>
+</html>

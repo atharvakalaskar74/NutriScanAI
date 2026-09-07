@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AI Nutrition Chatbot - NutriScan AI</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f1f7f2;
+    color: #222;
+}
+
+.navbar {
+    background: white;
+    padding: 16px 6%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,.08);
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #238636;
+    text-decoration: none;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.nav-btn {
+    text-decoration: none;
+    color: #238636;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.nav-btn:hover {
+    background: #eef8ef;
+}
+
+.nav-btn.active {
+    background: #238636;
+    color: white;
+}
+
+.logout {
+    text-decoration: none;
+    background: #d32f2f;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.container {
+    width: 90%;
+    max-width: 820px;
+    margin: 30px auto 50px;
+}
+
+.chat-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    height: 75vh;
+    overflow: hidden;
+}
+
+.chat-header {
+    padding: 20px 24px;
+    background: #fbfdfb;
+    border-bottom: 1px solid #eef3ef;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.bot-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: #e8f5e9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    border: 2px solid #238636;
+}
+
+.bot-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #238636;
+}
+
+.bot-subtitle {
+    font-size: 12px;
+    color: #777;
+    margin-top: 2px;
+}
+
+/* QUICK PROMPTS */
+.quick-prompts {
+    padding: 10px 20px;
+    background: #f8fcf8;
+    border-bottom: 1px solid #eef3ef;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.prompt-chip {
+    background: white;
+    border: 1px solid #cce8cf;
+    color: #238636;
+    padding: 6px 14px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.prompt-chip:hover {
+    background: #238636;
+    color: white;
+}
+
+/* CHAT MESSAGES */
+.chat-messages {
+    flex-grow: 1;
+    padding: 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: #fdfefd;
+}
+
+.message {
+    display: flex;
+    gap: 10px;
+    max-width: 80%;
+    line-height: 1.5;
+    font-size: 14px;
+}
+
+.message.bot {
+    align-self: flex-start;
+}
+
+.message.user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.msg-bubble {
+    padding: 14px 18px;
+    border-radius: 18px;
+}
+
+.message.bot .msg-bubble {
+    background: #f4f9f4;
+    color: #222;
+    border: 1px solid #e1ede1;
+    border-top-left-radius: 4px;
+}
+
+.message.user .msg-bubble {
+    background: #238636;
+    color: white;
+    border-top-right-radius: 4px;
+}
+
+.typing-indicator {
+    display: none;
+    font-style: italic;
+    color: #888;
+    font-size: 13px;
+    margin-left: 10px;
+    margin-bottom: 10px;
+}
+
+/* INPUT BAR */
+.chat-input-bar {
+    padding: 16px 20px;
+    background: white;
+    border-top: 1px solid #eef3ef;
+    display: flex;
+    gap: 10px;
+}
+
+.chat-input {
+    flex-grow: 1;
+    padding: 13px 18px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    font-size: 14px;
+    outline: none;
+}
+
+.chat-input:focus {
+    border-color: #238636;
+}
+
+.send-btn {
+    background: #238636;
+    color: white;
+    border: none;
+    padding: 0 24px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.send-btn:hover {
+    background: #176b29;
+}
+
+@media(max-width:650px) {
+    .navbar {
+        flex-direction: column;
+        gap: 12px;
+    }
+    .chat-card {
+        height: 82vh;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+    <a class="logo" href="{{ url_for('dashboard') }}">
+        🥗 NutriScan AI
+    </a>
+
+    <div class="nav-links">
+        <a class="nav-btn" href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a class="nav-btn" href="{{ url_for('scan_food') }}">📸 Scan Food</a>
+        <a class="nav-btn" href="{{ url_for('meal_history') }}">📅 History</a>
+        <a class="nav-btn" href="{{ url_for('analytics') }}">📈 Analytics</a>
+        <a class="nav-btn active" href="{{ url_for('chatbot_page') }}">🤖 AI Chatbot</a>
+        <a class="nav-btn" href="{{ url_for('profile') }}">👤 Profile</a>
+        <a class="logout" href="{{ url_for('logout') }}">Logout</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="chat-card">
+
+        <div class="chat-header">
+            <div class="bot-avatar">🤖</div>
+            <div>
+                <div class="bot-title">NutriScan AI Nutritionist</div>
+                <div class="bot-subtitle">Answers questions grounded in your authentic database meals.</div>
+            </div>
+        </div>
+
+        <!-- QUICK PROMPT CHIPS -->
+        <div class="quick-prompts">
+            <div class="prompt-chip" onclick="sendQuickPrompt('How much protein did I eat today?')">💪 Protein today?</div>
+            <div class="prompt-chip" onclick="sendQuickPrompt('What are my total calories today?')">🔥 Calories today?</div>
+            <div class="prompt-chip" onclick="sendQuickPrompt('What did I eat today?')">🍽️ Today's meals?</div>
+            <div class="prompt-chip" onclick="sendQuickPrompt('Show my recent meals')">📅 Recent meals</div>
+            <div class="prompt-chip" onclick="sendQuickPrompt('Suggest a healthy meal for my goal')">💡 Food recommendation</div>
+            <div class="prompt-chip" onclick="sendQuickPrompt('What are good fiber sources?')">🌾 Fiber sources</div>
+        </div>
+
+        <!-- MESSAGES -->
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot">
+                <div class="msg-bubble">
+                    Hello {{ user_name }}! 👋 I am your personal <b>NutriScan AI Nutrition Assistant</b>.<br><br>
+                    You can ask me about your logged intake today (e.g. <i>"How much protein did I eat today?"</i>, <i>"What are my total calories?"</i>), your recent meals, or dietary tips for your fitness goals!
+                </div>
+            </div>
+        </div>
+
+        <div class="typing-indicator" id="typingIndicator">
+            🤖 NutriScan AI is thinking...
+        </div>
+
+        <!-- INPUT FORM -->
+        <form class="chat-input-bar" id="chatForm" onsubmit="handleSend(event)">
+            <input
+                type="text"
+                id="userInput"
+                class="chat-input"
+                placeholder="Ask about your nutrition, calories, or diet..."
+                autocomplete="off"
+                required
+            >
+            <button type="submit" class="send-btn" id="sendBtn">Send</button>
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+const chatMessages = document.getElementById("chatMessages");
+const userInput = document.getElementById("userInput");
+const typingIndicator = document.getElementById("typingIndicator");
+const sendBtn = document.getElementById("sendBtn");
+
+function appendMessage(sender, text) {
+    const msgDiv = document.createElement("div");
+    msgDiv.className = `message ${sender}`;
+    const formatted = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+                          .replace(/\n/g, '<br>')
+                          .replace(/•/g, '&bull;');
+
+    msgDiv.innerHTML = `<div class="msg-bubble">${formatted}</div>`;
+    chatMessages.appendChild(msgDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+async function sendMessage(messageText) {
+    const text = messageText.trim();
+    if (!text) return;
+
+    appendMessage("user", text);
+    userInput.value = "";
+    userInput.focus();
+
+    typingIndicator.style.display = "block";
+    sendBtn.disabled = true;
+
+    try {
+        const res = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: text })
+        });
+
+        const data = await res.json();
+        typingIndicator.style.display = "none";
+        sendBtn.disabled = false;
+
+        if (data.success) {
+            appendMessage("bot", data.reply);
+        } else {
+            appendMessage("bot", "⚠️ " + (data.reply || "Could not process that question."));
+        }
+    } catch (err) {
+        typingIndicator.style.display = "none";
+        sendBtn.disabled = false;
+        appendMessage("bot", "❌ Connection error with chatbot service.");
+        console.error(err);
+    }
+}
+
+function handleSend(e) {
+    e.preventDefault();
+    sendMessage(userInput.value);
+}
+
+function sendQuickPrompt(promptText) {
+    sendMessage(promptText);
+}
+</script>
+
+</body>
+
+</html>

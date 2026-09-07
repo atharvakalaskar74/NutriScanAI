@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Meal History - NutriScan AI</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f1f7f2;
+    color: #222;
+}
+
+.navbar {
+    background: white;
+    padding: 16px 6%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,.08);
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #238636;
+    text-decoration: none;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.nav-btn {
+    text-decoration: none;
+    color: #238636;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.nav-btn:hover {
+    background: #eef8ef;
+}
+
+.nav-btn.active {
+    background: #238636;
+    color: white;
+}
+
+.logout {
+    text-decoration: none;
+    background: #d32f2f;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.container {
+    width: 90%;
+    max-width: 960px;
+    margin: 35px auto 60px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+h1 {
+    color: #238636;
+    margin: 0;
+    font-size: 28px;
+}
+
+.scan-btn {
+    text-decoration: none;
+    background: #238636;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.meal-card {
+    background: white;
+    margin-top: 18px;
+    padding: 22px;
+    border-radius: 18px;
+    box-shadow: 0 4px 15px rgba(0,0,0,.07);
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.meal-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 14px;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: #e8f5e9;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.meal-body {
+    flex-grow: 1;
+}
+
+.meal-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.food-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #238636;
+}
+
+.badges {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.badge-type {
+    background: #e8f0fe;
+    color: #1967d2;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.badge-score {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: bold;
+    color: white;
+}
+
+.meal-time {
+    color: #888;
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+.macro-row {
+    display: flex;
+    gap: 16px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+    background: #f8fcf8;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid #e2ede3;
+}
+
+.macro-item {
+    font-size: 13px;
+    color: #444;
+}
+
+.macro-val {
+    font-weight: bold;
+    color: #238636;
+    font-size: 15px;
+}
+
+.ai-box {
+    margin-top: 14px;
+    padding: 12px 16px;
+    background: #eef8ef;
+    border-radius: 10px;
+    border-left: 4px solid #238636;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #333;
+}
+
+.empty {
+    background: white;
+    padding: 40px;
+    text-align: center;
+    border-radius: 18px;
+    box-shadow: 0 4px 15px rgba(0,0,0,.06);
+}
+
+@media(max-width:650px) {
+    .meal-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .meal-img {
+        width: 100%;
+        height: 180px;
+    }
+    .navbar {
+        flex-direction: column;
+        gap: 12px;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+    <a class="logo" href="{{ url_for('dashboard') }}">
+        🥗 NutriScan AI
+    </a>
+
+    <div class="nav-links">
+        <a class="nav-btn" href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a class="nav-btn" href="{{ url_for('scan_food') }}">📸 Scan Food</a>
+        <a class="nav-btn active" href="{{ url_for('meal_history') }}">📅 History</a>
+        <a class="nav-btn" href="{{ url_for('analytics') }}">📈 Analytics</a>
+        <a class="nav-btn" href="{{ url_for('chatbot_page') }}">🤖 AI Chatbot</a>
+        <a class="nav-btn" href="{{ url_for('profile') }}">👤 Profile</a>
+        <a class="logout" href="{{ url_for('logout') }}">Logout</a>
+    </div>
+</div>
+
+<div class="container">
+
+<div class="header">
+    <h1>📅 Scanned Meal History</h1>
+    <a class="scan-btn" href="{{ url_for('scan_food') }}">
+        📸 Scan New Food
+    </a>
+</div>
+
+{% if meals %}
+
+{% for meal in meals %}
+
+<div class="meal-card">
+
+    {% if meal.image_url %}
+    <img src="{{ meal.image_url }}" class="meal-img" alt="{{ meal.food_name }}" onerror="this.src='https://placehold.co/100x100?text=Food'">
+    {% else %}
+    <div class="meal-img" style="display:flex; align-items:center; justify-content:center; font-size:32px;">🍽️</div>
+    {% endif %}
+
+    <div class="meal-body">
+
+        <div class="meal-top">
+            <div class="food-title">🍽️ {{ meal.food_name }}</div>
+            <div class="badges">
+                <span class="badge-type">{{ meal.meal_type or "Meal" }}</span>
+                {% if meal.health_score %}
+                <span class="badge-score" style="background:{{ meal.health_score.color }};">
+                    Score: {{ meal.health_score.score }}/100
+                </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="meal-time">Logged on: {{ meal.created_at }}</div>
+
+        <div class="macro-row">
+            <div class="macro-item">Calories: <span class="macro-val">{{ meal.calories }} kcal</span></div>
+            <div class="macro-item">Protein: <span class="macro-val">{{ meal.protein }}g</span></div>
+            <div class="macro-item">Carbs: <span class="macro-val">{{ meal.carbohydrates }}g</span></div>
+            <div class="macro-item">Fat: <span class="macro-val">{{ meal.fat }}g</span></div>
+            <div class="macro-item">Fiber: <span class="macro-val">{{ meal.fiber }}g</span></div>
+        </div>
+
+        {% if meal.ai_message or meal.recommendation %}
+        <div class="ai-box">
+            {% if meal.ai_message %}
+            <div><b>🤖 AI Insight:</b> {{ meal.ai_message }}</div>
+            {% endif %}
+            {% if meal.recommendation %}
+            <div style="margin-top:4px;"><b>💡 Recommendation:</b> {{ meal.recommendation }}</div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endfor %}
+
+{% else %}
+
+<div class="empty">
+    <h2>No meals recorded yet 🍽️</h2>
+    <p>Analyze a food photo from the Scan Food section and it will automatically appear here with full nutritional breakdowns.</p>
+    <a class="scan-btn" href="{{ url_for('scan_food') }}" style="display:inline-block; margin-top:10px;">
+        📸 Scan Your First Meal
+    </a>
+</div>
+
+{% endif %}
+
+</div>
+
+</body>
+
+</html>
