@@ -24,7 +24,7 @@ if hasattr(sys.stderr, "reconfigure"):
 app = Flask(__name__)
 
 # Secret key for login sessions
-app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret-key")
+app.secret_key = os.getenv("FLASK_SECRET_KEY") or "nutriscan-dev-secret-key-change-this"
 
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
