@@ -1,5 +1,18 @@
 import os
+import sys
 import mysql.connector
+
+# Ensure UTF-8 stdout/stderr to prevent UnicodeEncodeError
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+if hasattr(sys.stderr, "reconfigure"):
+    try:
+        sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
 
 def get_db():
     return mysql.connector.connect(
@@ -12,7 +25,7 @@ def get_db():
 
 try:
     db = get_db()
-    print("✅ NutriScan MySQL Database Connected!")
+    print("[NutriScan] MySQL Database Connected successfully.")
     db.close()
 except Exception as e:
-    print("❌ Database connection failed:", e)
+    print(f"[NutriScan] Database connection notice: {e}")

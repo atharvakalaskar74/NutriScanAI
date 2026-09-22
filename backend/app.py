@@ -21,12 +21,16 @@ if hasattr(sys.stderr, "reconfigure"):
     except Exception:
         pass
 
-app = Flask(__name__)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+template_dir = os.path.join(BASE_DIR, "templates")
+
+app = Flask(__name__, template_folder=template_dir)
 
 # Secret key for login sessions
 app.secret_key = os.getenv("FLASK_SECRET_KEY") or "nutriscan-dev-secret-key-change-this"
 
-UPLOAD_FOLDER = "uploads"
+is_serverless = bool(os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME") or os.environ.get("NETLIFY"))
+UPLOAD_FOLDER = "/tmp/uploads" if is_serverless else os.path.join(BASE_DIR, "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
